@@ -1,0 +1,271 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For You ❤️</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+body{
+  height:100vh;
+  overflow:hidden;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      #f6b6c9,
+      #f6b6c9 20px,
+      #f2a6bd 20px,
+      #f2a6bd 40px
+    );
+}
+
+/* START SCREEN */
+#start{
+  position:fixed;
+  inset:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  color:#fff;
+  font-size:1.8rem;
+  text-align:center;
+  z-index:10;
+}
+
+/* SCENE */
+.scene{
+  position:fixed;
+  inset:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  perspective:1200px;
+  opacity:0;
+  transition:opacity 1s ease;
+}
+
+/* CAROUSEL */
+.carousel{
+  width:260px;
+  height:340px;
+  position:relative;
+  transform-style:preserve-3d;
+  transition:transform 1.2s ease;
+}
+
+/* SLIDES */
+.slide{
+  position:absolute;
+  width:100%;
+  height:100%;
+  transition:filter 0.8s ease, transform 0.8s ease;
+}
+
+.slide img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  border-radius:14px;
+}
+
+/* STATES */
+.blur{
+  filter:blur(3px);
+}
+
+.active{
+  filter:none;
+  box-shadow:0 0 22px rgba(0,180,255,0.9);
+  transform:scale(1.05);
+}
+
+/* CAPTION */
+.caption{
+  position:absolute;
+  bottom:10px;
+  left:50%;
+  transform:translateX(-50%);
+  width:90%;
+  padding:6px;
+  font-size:0.85rem;
+  color:#fff;
+  background:rgba(0,0,0,0.35);
+  border-radius:8px;
+  text-align:center;
+  opacity:0;
+  transition:opacity 1s ease;
+}
+
+/* EMOJI RAIN */
+.emoji{
+  position:fixed;
+  top:-5%;
+  font-size:1.5rem;
+  animation:fall linear forwards;
+  pointer-events:none;
+  z-index:1;
+}
+
+@keyframes fall{
+  to{
+    transform:translateY(110vh) rotate(360deg);
+    opacity:0;
+  }
+}
+
+/* NOTE */
+#note{
+  position:fixed;
+  inset:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  opacity:0;
+  z-index:5;
+}
+
+#note div{
+  padding:20px 30px;
+  background:#f59bb8;
+  border:3px solid hotpink;
+  color:#fff;
+  border-radius:16px;
+  font-size:0.85rem;
+  text-align:center;
+}
+
+/* 📱 MOBILE FIX */
+@media (max-width:600px){
+  .carousel{
+    width:200px;
+    height:260px;
+  }
+
+  .active{
+    transform:scale(1.03);
+  }
+
+  .caption{
+    font-size:0.75rem;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div id="start">I've made something for you ❤️</div>
+
+<div class="scene" id="scene">
+  <div class="carousel" id="carousel">
+
+    <div class="slide"><img src="IMG_20250430_194927_593.jpg"><div class="caption">You make everything softer 💖</div></div>
+    <div class="slide"><img src="IMG_20250523_154426_939.jpg"><div class="caption">My calm and my chaos ❤️</div></div>
+    <div class="slide"><img src="IMG_20250531_135707_788.jpg"><div class="caption">You feel like home 🌸</div></div>
+    <div class="slide"><img src="IMG_20250531_135714_002.jpg"><div class="caption">I choose you, always 🌹</div></div>
+    <div class="slide"><img src="IMG_20250603_223146_173.jpg"><div class="caption">Your smile fixes my day ✨</div></div>
+    <div class="slide"><img src="IMG_20250831_011636_887.jpg"><div class="caption">You are my favorite thought 💕</div></div>
+    <div class="slide"><img src="IMG_20250908_221453_083.jpg"><div class="caption">Everything’s better with you 🌺</div></div>
+    <div class="slide"><img src="IMG_20250925_022129_156.jpg"><div class="caption">Forever looks good with you ❤️</div></div>
+
+  </div>
+</div>
+
+<div id="note">
+  <div>I love you❤️✨</div>
+</div>
+
+<script>
+const slides = document.querySelectorAll(".slide");
+const carousel = document.getElementById("carousel");
+const scene = document.getElementById("scene");
+const start = document.getElementById("start");
+const note = document.getElementById("note");
+
+let index = 0;
+const total = slides.length;
+const angle = 360 / total;
+
+/* RESPONSIVE DEPTH */
+const depth = window.innerWidth < 600 ? 300 : 420;
+
+/* POSITION SLIDES */
+slides.forEach((slide,i)=>{
+  slide.style.transform = `rotateY(${i * angle}deg) translateZ(${depth}px)`;
+  slide.classList.add("blur");
+});
+
+/* START */
+function startExperience(){
+  if(!start) return;
+  start.remove();
+  scene.style.opacity = "1";
+  startEmojiRain();
+  rotateStep();
+}
+
+document.addEventListener("click", startExperience);
+document.addEventListener("keydown", e=>{
+  if(e.code === "Space") startExperience();
+});
+
+/* STEP ROTATION */
+function rotateStep(){
+  showSlide(index);
+  carousel.style.transform = `rotateY(${-index * angle}deg)`;
+
+  setTimeout(()=>{
+    hideSlide(index);
+    index++;
+
+    if(index === total){
+      endCarousel();
+      return;
+    }
+    rotateStep();
+  },4000);
+}
+
+function showSlide(i){
+  slides[i].classList.remove("blur");
+  slides[i].classList.add("active");
+  slides[i].querySelector(".caption").style.opacity = "1";
+}
+
+function hideSlide(i){
+  slides[i].classList.remove("active");
+  slides[i].classList.add("blur");
+  slides[i].querySelector(".caption").style.opacity = "0";
+}
+
+/* EMOJI RAIN */
+function startEmojiRain(){
+  setInterval(()=>{
+    const e = document.createElement("div");
+    e.className = "emoji";
+    e.innerText = ["❤️","🌹","🌸","🌺"][Math.floor(Math.random()*4)];
+    e.style.left = Math.random() * 100 + "vw";
+    e.style.animationDuration = (3 + Math.random()*3) + "s";
+    document.body.appendChild(e);
+    setTimeout(()=>e.remove(),6000);
+  },250);
+}
+
+/* END */
+function endCarousel(){
+  carousel.style.transform += " translateY(120vh)";
+  setTimeout(()=>{
+    note.style.opacity = "1";
+  },1200);
+}
+</script>
+
+</body>
+</html>
